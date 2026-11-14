@@ -18,7 +18,9 @@ import yaml
 HERE = Path(__file__).parent
 DATA = Path(os.environ.get("RADIO_DATA", HERE / "data"))
 TZ = ZoneInfo("America/Manaus")
-CHUNK = 900            # s por pedaço enviado ao Whisper (~7MB a 64k)
+CHUNK = 900            # s por pedaço enviado ao Whisper (API)
+KBPS = int(os.environ.get("RADIO_KBPS", 32))  # 32k mono = 14,4 MB/h (fala fica ok)
+KEEP_DAYS = int(os.environ.get("RADIO_KEEP_DAYS", 3))  # apaga áudio bruto mais velho (clipes ficam)
 PAD_REC = 30           # s extras gravados antes/depois da janela
 PAD_CLIP = (0.5, 0.8)  # s de folga no início/fim do clipe
 MAX_SIDE = 150         # s máx. procurados para cada lado da menção
@@ -107,7 +109,7 @@ def record(sid, start, end):
         subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-reconnect", "1",
                         "-reconnect_streamed", "1", "-reconnect_delay_max", "10", "-i", src,
                         "-t", str(int(left)), "-vn", "-ac", "1", "-ar", "22050",
-                        "-c:a", "libmp3lame", "-b:a", "64k", str(f)])
+                        "-c:a", "libmp3lame", "-b:a", f"{KBPS}k", str(f)])
         if f.exists() and f.stat().st_size > 20000:
             files.append(f)
         time.sleep(5)
@@ -119,6 +121,13 @@ def cmd_record(a):
     d = datetime.now(TZ).date()
     for f in record(sid, hm(d, s) - timedelta(seconds=PAD_REC), hm(d, e)):
         process(f)
+
+
+def prune():
+    lim = time.time() - KEEP_DAYS * 86400
+    for f in (DATA / "audio").rglob("*.mp3"):
+        if f.stat().st_mtime < lim:
+            f.unlink()
 
 
 def cmd_daemon(_):
@@ -134,6 +143,7 @@ def cmd_daemon(_):
             print(f"{now:%H:%M} gravando {st[sid]['emissora']} até {b:%H:%M}")
             threading.Thread(target=lambda s=sid, x=a, y=b: [process(f) for f in record(s, x, y)],
                              daemon=True).start()
+        prune()
         time.sleep(20)
 
 
@@ -160,9 +170,9 @@ def asr_openai(f):
     return segs, words
 
 
-def asr_local(f):  # RADIO_ASR=local (precisa de faster-whisper; CPU/GPU fortes)
+def asr_local(f):  # padrão: faster-whisper local, grátis (RADIO_ASR=openai usa a API)
     from faster_whisper import WhisperModel
-    m = WhisperModel(os.environ.get("RADIO_MODEL", "small"), compute_type="int8")
+    m = WhisperModel(os.environ.get("RADIO_MODEL", "small"), compute_type="int8")  # tiny/base/small/medium
     it, _ = m.transcribe(str(f), language="pt", word_timestamps=True, vad_filter=True)
     segs, words = [], []
     for s in it:
@@ -175,7 +185,7 @@ def transcribe(f):
     j = f.with_suffix(".json")
     if j.exists():
         return j
-    segs, words = (asr_local if os.environ.get("RADIO_ASR") == "local" else asr_openai)(f)
+    segs, words = (asr_openai if os.environ.get("RADIO_ASR") == "openai" else asr_local)(f)
     sid, ts = f.stem.split("_", 1)
     j.write_text(json.dumps({"audio": f.name, "station_id": sid,
                              "start": datetime.strptime(ts, "%Y%m%d_%H%M%S").replace(tzinfo=TZ).isoformat(),
@@ -218,23 +228,34 @@ def bounds_gap(segs, i, j):
     return a, b
 
 
+def llm_json(system, user):
+    """RADIO_LLM=ollama (grátis/local, modelo em RADIO_LLM_MODEL) ou OpenAI gpt-4o-mini."""
+    msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+    if os.environ.get("RADIO_LLM") == "ollama":
+        import requests
+        r = requests.post("http://localhost:11434/api/chat", timeout=300, json={
+            "model": os.environ.get("RADIO_LLM_MODEL", "qwen2.5:7b"), "messages": msgs,
+            "format": "json", "stream": False, "options": {"temperature": 0}})
+        return r.json()["message"]["content"]
+    from openai import OpenAI
+    r = OpenAI().chat.completions.create(model="gpt-4o-mini", temperature=0,
+                                         response_format={"type": "json_object"}, messages=msgs)
+    return r.choices[0].message.content
+
+
 def bounds_llm(segs, i, j, termo):
     """IA (gpt-4o-mini) decide onde a matéria começa e termina dentro da janela."""
-    from openai import OpenAI
     lo = max(0, i - 40); hi = min(len(segs) - 1, j + 40)
     while lo < i and segs[i]["start"] - segs[lo]["start"] > MAX_SIDE: lo += 1
     while hi > j and segs[hi]["end"] - segs[j]["end"] > MAX_SIDE: hi -= 1
     lines = "\n".join(f"[{k}] ({segs[k]['start']:.1f}s) {segs[k]['text']}" for k in range(lo, hi + 1))
-    r = OpenAI().chat.completions.create(
-        model="gpt-4o-mini", temperature=0, response_format={"type": "json_object"},
-        messages=[{"role": "system", "content":
-                   "Você recorta matérias de radiojornal. Recebe trechos numerados de uma transcrição. "
-                   "Devolva JSON {\"inicio\":n,\"fim\":n}: primeiro e último trecho da MATÉRIA (um único assunto/"
-                   "reportagem/nota) que contém a menção. O início é a chamada/abertura do assunto (inclua a "
-                   "frase do apresentador que introduz); o fim é a última frase antes de mudar de assunto, "
-                   "vinheta, comercial ou chamada de outro tema. Não inclua matérias vizinhas."},
-                  {"role": "user", "content": f"Menção: {termo!r} nos trechos {i}-{j}.\n\n{lines}"}])
-    d = json.loads(r.choices[0].message.content)
+    system = ("Você recorta matérias de radiojornal. Recebe trechos numerados de uma transcrição. "
+              "Devolva JSON {\"inicio\":n,\"fim\":n}: primeiro e último trecho da MATÉRIA (um único assunto/"
+              "reportagem/nota) que contém a menção. O início é a chamada/abertura do assunto (inclua a "
+              "frase do apresentador que introduz); o fim é a última frase antes de mudar de assunto, "
+              "vinheta, comercial ou chamada de outro tema. Não inclua matérias vizinhas.")
+    user = f"Menção: {termo!r} nos trechos {i}-{j}.\n\n{lines}"
+    d = json.loads(llm_json(system, user))
     a, b = int(d["inicio"]), int(d["fim"])
     return (a, b) if lo <= a <= i and j <= b <= hi else bounds_gap(segs, i, j)
 
@@ -244,7 +265,7 @@ def cut_file(jpath):
     segs, base = T["segments"], datetime.fromisoformat(T["start"])
     audio = Path(jpath).with_name(T["audio"])
     st = stations()[T["station_id"]]
-    use_llm = bool(os.environ.get("OPENAI_API_KEY")) and os.environ.get("RADIO_BOUNDS") != "gap"
+    use_llm = (os.environ.get("RADIO_LLM") == "ollama" or bool(os.environ.get("OPENAI_API_KEY"))) and os.environ.get("RADIO_BOUNDS") != "gap"
     # 1 clipe por (cliente, matéria): funde menções que caem na mesma matéria
     clips = {}
     for cli, termo, i, j in find_hits(segs):

@@ -1,5 +1,5 @@
-openai>=1.40
+faster-whisper   # transcrição local grátis (roda no Mac)
 pyyaml
 requests
-# opcional (transcrição local, sem API): faster-whisper
-# opcional (Difusora FM no YouTube): yt-dlp
+yt-dlp           # só para a Difusora FM (YouTube)
+# opcional: openai (só se usar RADIO_ASR=openai ou o corte via gpt-4o-mini)

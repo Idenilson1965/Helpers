@@ -9,24 +9,29 @@ Fluxo: **grava stream nos horários → Whisper transcreve (com tempos) → acha
 - `clientes.yaml` – clientes e termos que disparam o corte.
 - `radio.py` – tudo (plan / daemon / record / transcribe / cut). `find_streams.py` – caça URLs de stream.
 
-## Uso
+## Uso local (Mac, 100% grátis)
 ```
-pip install -r requirements.txt ; apt install ffmpeg
-export OPENAI_API_KEY=...
+brew install ffmpeg ollama ; ollama pull qwen2.5:7b      # LLM local p/ achar início/fim da matéria
+pip install -r requirements.txt
+export RADIO_LLM=ollama                                  # sem isso e sem chave OpenAI, corta por silêncio (impreciso)
 python find_streams.py --write   # tenta achar stream_url; confira o que sobrar à mão
 python radio.py plan             # janelas de hoje e o que falta
-python radio.py daemon           # grava, transcreve e corta sozinho (rodar com systemd/tmux)
+python radio.py daemon           # grava, transcreve e corta sozinho
 ```
-Saída: `data/clips/<cliente>/*.mp3` e `data/clips.csv` (data/hora, cliente, termo, emissora,
-programa, duração, arquivo, texto).
+Variáveis: `RADIO_MODEL` (tiny/base/small/medium; padrão small), `RADIO_KBPS` (padrão 32),
+`RADIO_KEEP_DAYS` (padrão 3: apaga o áudio bruto antigo, os clipes ficam), `RADIO_DATA` (pasta de dados),
+`RADIO_ASR=openai` (usa a API paga no lugar do Whisper local).
+
+## Onde grava e quanto ocupa
+Grava em `amazonradio/data/audio/AAAA-MM-DD/<emissora>_<data>_<hora>.mp3` **na máquina onde o daemon roda**.
+mp3 mono: 32 kbps = 14,4 MB/h (padrão) · 64 kbps = 28,8 MB/h.
+Os 162 h/dia: **~2,3 GB/dia a 32k** (~70 GB/mês) · ~4,7 GB/dia a 64k (~140 GB/mês). Com `RADIO_KEEP_DAYS=3`
+o áudio bruto nunca passa de ~7 GB a 32k; os clipes e a transcrição (.json, pequena) ficam.
 
 ## Pontos de atenção
-- **stream_url**: os links da planilha são sites/agregadores, não streams diretos. Sem isso não grava.
-  Difusora FM está só no YouTube (usa `yt-dlp`, instale). Rádios do governo/Marinha/Câmara têm stream oficial.
-- **Custo**: ~162 h/dia gravadas. Whisper API ≈ US$0,006/min ⇒ ≈ US$58/dia. Para cortar: gravar só
-  as emissoras que importam, ou `RADIO_ASR=local` (faster-whisper; precisa de CPU/GPU decente —
-  a GTX 750 Ti de 2 GB do servidor atual não serve para modelos grandes).
-- **Corte**: com `OPENAI_API_KEY`, gpt-4o-mini decide onde a matéria começa/termina; sem chave
-  (ou `RADIO_BOUNDS=gap`) usa silêncio entre falas, que é bem menos preciso em rádio.
-- Os clipes são regravados em mp3 96k para o corte ser exato ao quadro (sem depender de keyframe).
-- Dados em `data/` (`RADIO_DATA` muda o caminho). Reprocessar: apague o `.json` e rode `transcribe`.
+- **stream_url**: os links da planilha são sites, não streams diretos. Sem isso não grava.
+  Difusora FM está só no YouTube (`yt-dlp`).
+- **Velocidade no Mac**: transcrever 162 h/dia pede muito processamento; comece com poucas emissoras
+  (`schedule.csv`) e o modelo `base` ou `small`, e meça. Não medi neste projeto.
+- Os clipes são regravados em mp3 96k para o corte ser exato (sem depender de keyframe).
+- Reprocessar: apague o `.json` do áudio e rode `transcribe`.
