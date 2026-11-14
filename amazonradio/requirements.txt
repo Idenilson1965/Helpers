@@ -4,3 +4,4 @@ pyyaml
 requests
 yt-dlp           # só para a Difusora FM (YouTube)
 # opcional: openai (só se usar RADIO_ASR=openai ou o corte via gpt-4o-mini)
+openpyxl         # planilha da TV

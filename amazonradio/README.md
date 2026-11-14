@@ -35,3 +35,13 @@ o áudio bruto nunca passa de ~7 GB a 32k; os clipes e a transcrição (.json, p
   (`schedule.csv`) e o modelo `base` ou `small`, e meça. Não medi neste projeto.
 - Os clipes são regravados em mp3 96k para o corte ser exato (sem depender de keyframe).
 - Reprocessar: apague o `.json` do áudio e rode `transcribe`.
+
+## TV (playlists do YouTube)
+`tv_playlists.csv` tem as 22 playlists (A Crítica Brasil marcada `não`). Precisa de acesso ao YouTube (rodar no Mac).
+```
+python tv.py map     # -> programas_tv.xlsx (dias, horário, último vídeo, linhas vermelhas = sem vídeo há >60 dias)
+python tv.py watch   # a cada 10 min: vídeos com >=1h (TV_DELAY_MIN) -> áudio -> Whisper -> clientes -> corta só a matéria em mp4
+```
+Clipes em `data/tv/clips/<cliente>/` + `data/tv/clips_tv.csv`. Upload: `export AMAZONCLIP_UPLOAD_CMD='python upload.py {file}'`
+(chamado para cada clipe; falta definir como o Amazon Clip recebe — ver memorial).
+O horário é o de **publicação** do vídeo, não a grade oficial da TV.
