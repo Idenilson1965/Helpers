@@ -1,0 +1,11 @@
+# Clientes e assuntos de interesse. Edite à vontade.
+# "termos": nomes/variações que, ditos na rádio, disparam o corte (sem diferenciar acento/maiúscula).
+clientes:
+  - nome: Amazonas Energia
+    termos: ["Amazonas Energia", "Amazonas Distribuidora"]
+  - nome: Cigás
+    termos: ["Cigás", "Companhia de Gás do Amazonas"]
+  - nome: Governo do Amazonas
+    termos: ["Secom", "Secretaria de Comunicação", "Governo do Estado do Amazonas"]
+  - nome: Sesi
+    termos: ["Sesi", "Serviço Social da Indústria"]

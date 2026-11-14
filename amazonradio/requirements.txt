@@ -1,0 +1,5 @@
+openai>=1.40
+pyyaml
+requests
+# opcional (transcrição local, sem API): faster-whisper
+# opcional (Difusora FM no YouTube): yt-dlp

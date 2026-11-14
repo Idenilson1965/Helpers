@@ -1,0 +1,74 @@
+station_id,programa,inicio,fim,abrangencia
+tiradentes,Manhã de Notícias,07:30,09:30,Local
+antena1,Boletins Informativos Antena 1,07:00,19:00,Rede / Local
+bandnews,Jornal BandNews (Madrugada),00:40,04:00,Rede Nacional
+bandnews,Noticiário Local / BandNews Manaus,04:00,06:00,Local
+bandnews,BandNews No Meio do Dia,06:00,09:00,Rede / Local
+bandnews,BandNews Duas a Dois,09:00,11:00,Rede Nacional
+bandnews,BandNews em Alta Frequência (Local),11:00,13:00,Local / Rede
+bandnews,O É da Coisa,13:00,14:20,Rede Nacional
+bandnews,Jornal da Band (Simulcast),14:20,15:10,Rede Nacional
+bandnews,Noticiário Local (Edição Noturna),19:00,20:00,Local
+nortefm,Boletins Norte Notícias,07:00,18:00,Local
+riosfm,Jornal da Rios,06:30,08:30,Local
+riosfm,Na Hora,12:00,14:00,Local
+riosfm,Rios do Conhecimento,19:00,20:00,Local
+difusorafm,Jornal da Manhã,06:00,07:30,Local
+difusorafm,Programa Daniel Anzoategui,07:30,10:00,Local
+difusorafm,Giro de Notícias,13:00,15:00,Local
+verdeoliva,Boletins Informativos / Noticiário Local,07:00,18:00,Local
+marinha,Manchetes dos Jornais,04:30,05:00,Rede / Local
+marinha,Maré de Notícias (1ª Edição),07:00,07:30,Rede / Local
+marinha,Notícias da Marinha,07:30,08:00,Rede / Local
+marinha,Maré de Notícias (2ª Edição),11:00,11:30,Rede / Local
+mixfm,Programa 18 Horas,18:00,19:00,Local
+cbn,CBN Madrugada,00:00,05:00,Rede Nacional
+cbn,Jornal da CBN,05:00,07:30,Rede / Local
+cbn,CBN Jornal da Manhã,07:30,09:00,Local
+cbn,CBN Brasil,09:00,11:00,Rede Nacional
+cbn,Estação CBN,13:00,14:30,Local
+cbn,Tarde de Notícias,14:30,16:00,Local
+cbn,Ponto Final CBN,16:00,19:00,Rede Nacional
+cbn,CBN Noite Total,20:00,23:00,Rede Nacional
+riomar,Jornal Primeira Hora (Nacional e Local),06:00,07:00,Rede / Local
+riomar,Arquidiocese em Notícias,07:00,08:00,Local
+riomar,Jornal Amazônia é Notícia,19:00,19:30,Local
+jovempan,Jornal da Manhã,05:00,07:00,Rede Nacional
+jovempan,Jovem Pan Morning Show,09:00,10:30,Rede Nacional
+jovempan,Os Pingos nos Is,17:00,19:00,Rede Nacional
+camara,Jornal Câmara Agora / Noticiário Legislativo,07:00,19:00,Rede / Local
+senado,Jornal do Senado / Conexão Senado,07:00,19:00,Rede Nacional
+alvorada,Jornal da Alvorada,06:00,07:00,Local
+alvorada,Notícias em 30,07:00,07:30,Local
+alvorada,Bom Dia Cidade,08:00,09:30,Local
+alvorada,Jornal da Amazônia,11:00,11:30,Regional
+alvorada,Comando Geral,11:30,13:00,Local
+alvorada,Jornal Amazônia é Notícia,19:00,19:30,Regional
+panorama,Bom Dia Comunidade,06:00,07:00,Local
+panorama,Jornal da Manhã,07:00,08:00,Local
+panorama,Chamada Geral,08:00,09:00,Local
+panorama,Em Sintonia Com o Povo,11:00,12:30,Local
+difusora_ita,Noticiário Local Difusora,07:00,08:30,Local
+rural_tefe,Jornal RCR - Edição Nacional,06:00,06:30,Rede Nacional
+rural_tefe,Jornal Circulando com a Notícia,07:00,08:00,Local
+rural_tefe,Jornal Rio Mar em Notícias,12:00,12:30,Regional
+rural_tefe,Jornal Amazônia é Notícia,19:00,19:30,Regional
+alternativa_tefe,Bom Dia Cidade,06:00,07:00,Local
+alternativa_tefe,Direto de Brasília,07:00,08:00,Rede / Local
+alternativa_tefe,A Voz do Povo,11:00,13:00,Local
+palmeira,Jornal da Manhã,06:00,07:00,Local
+palmeira,Noticiando,07:00,08:00,Local
+palmeira,Jornal da Cidade,11:00,12:00,Local
+nacional_solimoes,Repórter Nacional / Amazônia,07:00,08:00,Rede / Regional
+nacional_solimoes,Jornal Nacional do Alto Solimões,11:00,12:00,Local / Regional
+nacional_solimoes,Repórter Nacional (Edição da Noite),18:00,19:00,Rede Nacional
+independencia,Bom Dia Maués,06:00,07:30,Local
+independencia,Radar 91,07:30,08:30,Local
+independencia,Grande Jornal Independência,12:00,13:00,Local
+karababa,Bom Dia Carauari,06:00,07:30,Local
+karababa,Jornal da Tarde,12:00,13:00,Local
+castanho,Jornal Primeira Hora Local,06:00,07:00,Local
+castanho,Jornal Amazônia é Notícia,19:00,19:30,Regional
+autazes,Jornal Autazes em Notícia,07:00,08:30,Local
+r104_humaita,Jornal da 104,07:00,08:30,Local
+yande,Boletins Informativos Indígenas / Alto Rio Negro,08:00,18:00,Regional / Local
