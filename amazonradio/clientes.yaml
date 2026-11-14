@@ -1,11 +1,19 @@
 # Clientes e assuntos de interesse. Edite à vontade.
 # "termos": nomes/variações que, ditos na rádio, disparam o corte (sem diferenciar acento/maiúscula).
 clientes:
-  - nome: Amazonas Energia
-    termos: ["Amazonas Energia", "Amazonas Distribuidora"]
   - nome: Cigás
-    termos: ["Cigás", "Companhia de Gás do Amazonas"]
-  - nome: Governo do Amazonas
-    termos: ["Secom", "Secretaria de Comunicação", "Governo do Estado do Amazonas"]
-  - nome: Sesi
-    termos: ["Sesi", "Serviço Social da Indústria"]
+    termos: ["Cigás", "Cigas", "Companhia de Gás do Amazonas"]
+  - nome: Detran-AM
+    # "Detran" solto também pega Detran-SP/outros em redes nacionais; se der ruído, remova-o.
+    termos: ["Detran-AM", "Detran AM", "Detran Amazonas", "Detran do Amazonas", "Detran",
+             "Departamento Estadual de Trânsito do Amazonas"]
+  - nome: Sesi-AM
+    termos: ["Sesi Amazonas", "Sesi AM", "Sesi", "Serviço Social da Indústria"]
+  - nome: Senai-AM
+    termos: ["Senai Amazonas", "Senai AM", "Senai", "Serviço Nacional de Aprendizagem Industrial"]
+  - nome: Fieam
+    termos: ["Fieam", "Federação das Indústrias do Estado do Amazonas"]
+  - nome: Sedecti
+    # variações de como o Whisper costuma ouvir a sigla
+    termos: ["Sedecti", "Sedecte", "Sedect",
+             "Secretaria de Desenvolvimento Econômico, Ciência, Tecnologia e Inovação"]
