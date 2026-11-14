@@ -8,7 +8,7 @@ acha menções a clientes e corta a matéria exata.
   python radio.py transcribe [ARQ...]  # transcreve o que falta
   python radio.py cut [ARQ.json...]    # (re)corta clipes dos clientes
 """
-import csv, json, os, re, subprocess, sys, tempfile, threading, time, unicodedata
+import csv, json, os, platform, re, subprocess, sys, tempfile, threading, time, unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -181,11 +181,25 @@ def asr_local(f):  # padrão: faster-whisper local, grátis (RADIO_ASR=openai us
     return segs, words
 
 
+def asr_mlx(f):  # Apple Silicon (M1..M5): usa GPU/Neural do Mac via MLX
+    import mlx_whisper
+    r = mlx_whisper.transcribe(str(f), language="pt", word_timestamps=True,
+                               path_or_hf_repo=os.environ.get("RADIO_MLX_MODEL", "mlx-community/whisper-large-v3-turbo"))
+    segs = [{"start": s["start"], "end": s["end"], "text": s["text"].strip()} for s in r["segments"]]
+    words = [{"start": w["start"], "end": w["end"], "word": w["word"]} for s in r["segments"] for w in s.get("words", [])]
+    return segs, words
+
+
+def pick_asr():
+    e = os.environ.get("RADIO_ASR") or ("mlx" if sys.platform == "darwin" and platform.machine() == "arm64" else "faster")
+    return {"openai": asr_openai, "mlx": asr_mlx, "faster": asr_local}[e]
+
+
 def transcribe(f):
     j = f.with_suffix(".json")
     if j.exists():
         return j
-    segs, words = (asr_openai if os.environ.get("RADIO_ASR") == "openai" else asr_local)(f)
+    segs, words = pick_asr()(f)
     sid, ts = f.stem.split("_", 1)
     j.write_text(json.dumps({"audio": f.name, "station_id": sid,
                              "start": datetime.strptime(ts, "%Y%m%d_%H%M%S").replace(tzinfo=TZ).isoformat(),

@@ -1,4 +1,5 @@
-faster-whisper   # transcrição local grátis (roda no Mac)
+mlx-whisper      # Mac Apple Silicon (M1-M5): transcrição local grátis, usa GPU
+faster-whisper   # alternativa p/ Linux/Intel (instale só se não for Mac M)
 pyyaml
 requests
 yt-dlp           # só para a Difusora FM (YouTube)

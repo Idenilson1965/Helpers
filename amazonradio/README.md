@@ -20,7 +20,7 @@ python radio.py daemon           # grava, transcreve e corta sozinho
 ```
 Variáveis: `RADIO_MODEL` (tiny/base/small/medium; padrão small), `RADIO_KBPS` (padrão 32),
 `RADIO_KEEP_DAYS` (padrão 3: apaga o áudio bruto antigo, os clipes ficam), `RADIO_DATA` (pasta de dados),
-`RADIO_ASR=openai` (usa a API paga no lugar do Whisper local).
+`RADIO_ASR=mlx|faster|openai` (padrão: mlx em Mac M, faster nos demais), `RADIO_MLX_MODEL` (padrão whisper-large-v3-turbo; use `mlx-community/whisper-small-mlx` p/ ser mais leve).
 
 ## Onde grava e quanto ocupa
 Grava em `amazonradio/data/audio/AAAA-MM-DD/<emissora>_<data>_<hora>.mp3` **na máquina onde o daemon roda**.
